@@ -18,6 +18,7 @@ vi.mock("../../config/sessions/delivery-info.js", () => ({
 }));
 
 import { buildAgentPeerSessionKey } from "../../routing/session-key.js";
+import { projectRuntimeToolInputSchema } from "../tool-schema-projection.js";
 import { createCronTool } from "./cron-tool.js";
 
 describe("cron tool", () => {
@@ -476,9 +477,10 @@ describe("cron tool", () => {
     );
   });
 
-  it("advertises nullable cron update clears in the tool schema", () => {
+  it("advertises provider-compatible nullable cron update clears in the tool schema", () => {
     const tool = createTestCronTool();
-    const parameters = tool.parameters as SchemaLike;
+    const parameters = projectRuntimeToolInputSchema(tool.parameters, "cron.parameters")
+      .schema as SchemaLike;
     const jobDelivery = parameters.properties?.job?.properties?.delivery;
     const patch = parameters.properties?.patch;
     const payload = patch?.properties?.payload;
@@ -500,10 +502,8 @@ describe("cron tool", () => {
     expect(delivery?.properties?.channel?.anyOf).toBeUndefined();
     expect(delivery?.properties?.channel?.type).toBe("string");
     expect(delivery?.properties?.channel?.description).toContain("null to clear");
-    expect(delivery?.properties?.failureDestination?.anyOf?.map((entry) => entry.type)).toEqual([
-      "object",
-      "null",
-    ]);
+    expect(delivery?.properties?.failureDestination?.anyOf).toBeUndefined();
+    expect(delivery?.properties?.failureDestination?.type).toBe("object");
   });
 
   it.each([

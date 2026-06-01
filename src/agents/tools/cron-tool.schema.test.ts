@@ -28,10 +28,8 @@ function propertyAt(
 
 describe("CronToolSchema", () => {
   const projectedTool = createCronTool() as Tool;
-  const schemaRecord = projectRuntimeToolInputSchema(
-    projectedTool.parameters,
-    "cron.parameters",
-  ).schema as Record<string, unknown>;
+  const schemaRecord = projectRuntimeToolInputSchema(projectedTool.parameters, "cron.parameters")
+    .schema as Record<string, unknown>;
 
   // Regression: models like GPT-5.4 rely on these fields to populate job/patch.
   // If a field is removed from this list the test must be updated intentionally.
