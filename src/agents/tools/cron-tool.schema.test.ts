@@ -1,7 +1,7 @@
 import { validateToolArguments, type Tool } from "openclaw/plugin-sdk/llm";
 import { describe, expect, it } from "vitest";
 import { projectRuntimeToolInputSchema } from "../tool-schema-projection.js";
-import { createCronTool, CronToolSchema } from "./cron-tool.js";
+import { createCronTool } from "./cron-tool.js";
 
 /** Walk a TypeBox schema by dot-separated property path and return sorted keys. */
 function keysAt(schema: Record<string, unknown>, path: string): string[] {
@@ -27,8 +27,11 @@ function propertyAt(
 }
 
 describe("CronToolSchema", () => {
-  const schemaRecord = projectRuntimeToolInputSchema(CronToolSchema, "cron.parameters")
-    .schema as Record<string, unknown>;
+  const projectedTool = createCronTool() as Tool;
+  const schemaRecord = projectRuntimeToolInputSchema(
+    projectedTool.parameters,
+    "cron.parameters",
+  ).schema as Record<string, unknown>;
 
   // Regression: models like GPT-5.4 rely on these fields to populate job/patch.
   // If a field is removed from this list the test must be updated intentionally.
