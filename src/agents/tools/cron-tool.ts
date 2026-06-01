@@ -295,6 +295,29 @@ export const CronToolSchema = Type.Object(
   { additionalProperties: true },
 );
 
+function cloneSchemaValue<T>(value: T, seen = new WeakMap<object, unknown>()): T {
+  if (!value || typeof value !== "object") {
+    return value;
+  }
+  const cached = seen.get(value);
+  if (cached) {
+    return cached as T;
+  }
+  const target = Array.isArray(value) ? [] : {};
+  seen.set(value, target);
+  for (const key of Reflect.ownKeys(value)) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    if (!descriptor) {
+      continue;
+    }
+    if ("value" in descriptor) {
+      descriptor.value = cloneSchemaValue(descriptor.value, seen);
+    }
+    Object.defineProperty(target, key, descriptor);
+  }
+  return target as T;
+}
+
 type CronToolOptions = {
   agentSessionKey?: string;
   currentDeliveryContext?: DeliveryContext;
@@ -556,7 +579,7 @@ WAKE MODES (for wake action):
 - "now": wake immediately
 
 Use jobId canonical; id accepted compat. contextMessages (0-10) adds previous messages as job context.`,
-    parameters: CronToolSchema,
+    parameters: cloneSchemaValue(CronToolSchema),
     execute: async (_toolCallId, args) => {
       const params = args as Record<string, unknown>;
       const action = readStringParam(params, "action", { required: true });

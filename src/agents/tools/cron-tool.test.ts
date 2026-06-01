@@ -465,6 +465,17 @@ describe("cron tool", () => {
     expect(patchThreadId?.anyOf?.map((entry) => entry.type)).toEqual(["string", "number", "null"]);
   });
 
+  it("does not share mutable schema objects across cron tool instances", () => {
+    const first = createTestCronTool().parameters as SchemaLike;
+    const second = createTestCronTool().parameters as SchemaLike;
+
+    expect(first).not.toBe(second);
+    expect(first.properties?.patch).not.toBe(second.properties?.patch);
+    expect(first.properties?.patch?.properties?.agentId).not.toBe(
+      second.properties?.patch?.properties?.agentId,
+    );
+  });
+
   it("advertises nullable cron update clears in the tool schema", () => {
     const tool = createTestCronTool();
     const parameters = tool.parameters as SchemaLike;
