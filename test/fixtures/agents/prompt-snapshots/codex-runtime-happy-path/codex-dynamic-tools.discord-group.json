@@ -216,16 +216,8 @@
                       "type": "string"
                     },
                     "mode": {
-                      "anyOf": [
-                        {
-                          "const": "announce",
-                          "type": "string"
-                        },
-                        {
-                          "const": "webhook",
-                          "type": "string"
-                        }
-                      ]
+                      "enum": ["announce", "webhook"],
+                      "type": "string"
                     },
                     "to": {
                       "description": "Failure delivery target",
@@ -240,15 +232,8 @@
                   "type": "string"
                 },
                 "threadId": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    }
-                  ],
-                  "description": "Thread/topic id"
+                  "description": "Thread/topic id",
+                  "type": "string"
                 },
                 "to": {
                   "description": "Delivery target",
@@ -441,45 +426,27 @@
                   "type": "string"
                 },
                 "failureDestination": {
-                  "anyOf": [
-                    {
-                      "additionalProperties": true,
-                      "properties": {
-                        "accountId": {
-                          "description": "Failure delivery account, or null to clear",
-                          "type": "string"
-                        },
-                        "channel": {
-                          "description": "Failure delivery channel, or null to clear",
-                          "type": "string"
-                        },
-                        "mode": {
-                          "anyOf": [
-                            {
-                              "const": "announce",
-                              "type": "string"
-                            },
-                            {
-                              "const": "webhook",
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "to": {
-                          "description": "Failure delivery target, or null to clear",
-                          "type": "string"
-                        }
-                      },
-                      "type": "object"
+                  "additionalProperties": true,
+                  "description": "Failure destination, or null to clear",
+                  "properties": {
+                    "accountId": {
+                      "description": "Failure delivery account, or null to clear",
+                      "type": "string"
                     },
-                    {
-                      "type": "null"
+                    "channel": {
+                      "description": "Failure delivery channel, or null to clear",
+                      "type": "string"
+                    },
+                    "mode": {
+                      "enum": ["announce", "webhook"],
+                      "type": "string"
+                    },
+                    "to": {
+                      "description": "Failure delivery target, or null to clear",
+                      "type": "string"
                     }
-                  ],
-                  "description": "Failure destination, or null to clear"
+                  },
+                  "type": "object"
                 },
                 "mode": {
                   "description": "Delivery mode",
@@ -487,18 +454,8 @@
                   "type": "string"
                 },
                 "threadId": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "description": "Thread/topic id"
+                  "description": "Thread/topic id",
+                  "type": "string"
                 },
                 "to": {
                   "description": "Delivery target, or null to clear",
