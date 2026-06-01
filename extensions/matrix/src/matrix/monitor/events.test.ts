@@ -8,7 +8,6 @@ import type { MatrixRawEvent } from "./types.js";
 import { EventType } from "./types.js";
 
 type RoomEventListener = (roomId: string, event: MatrixRawEvent) => void;
-type FailedDecryptListener = (roomId: string, event: MatrixRawEvent, error: Error) => Promise<void>;
 type VerificationSummaryListener = (summary: MatrixVerificationSummary) => void;
 
 function getSentNoticeBody(sendMessage: ReturnType<typeof vi.fn>, index = 0): string {
@@ -216,6 +215,9 @@ function createHarness(params?: {
   if (!roomEventListener) {
     throw new Error("room.event listener was not registered");
   }
+  const failedDecryptRawListener = listeners.get("room.failed_decryption") as
+    | ((roomId: string, event: MatrixRawEvent, error: Error) => void)
+    | undefined;
 
   return {
     onRoomMessage,
@@ -234,9 +236,12 @@ function createHarness(params?: {
     roomDecryptedEventListener: listeners.get("room.decrypted_event") as
       | RoomEventListener
       | undefined,
-    failedDecryptListener: listeners.get("room.failed_decryption") as
-      | FailedDecryptListener
-      | undefined,
+    failedDecryptListener: failedDecryptRawListener
+      ? async (roomId: string, event: MatrixRawEvent, error: Error) => {
+          failedDecryptRawListener(roomId, event, error);
+          await flushTasks();
+        }
+      : undefined,
     verificationSummaryListener: listeners.get("verification.summary") as
       | VerificationSummaryListener
       | undefined,
